@@ -25,10 +25,27 @@ Menu
 #include <strings.h>
 #include <conio.h>
 
-struct info_livro{
-    char sigla; // [L]ivre, [E]mprestado, [R]eservado
-    int reg; // registro do livro
-};
+ 
+struct  info_aluno{ 
+ char   sigla;
+ char   RA[7]; 
+ int   dia_ret;   // dia – máx=31 
+ int   mes_ret;   // mes: fev=28 dias 
+ int   dia_dev;   // mes: abril=jun=set=nov=30 dias 
+ int   mes_dev;   // os demais = 31 dias
+ };
+
+typedef struct    livro{ 
+ int   reg_livro;    // gerado automaticamente 
+ char   titulo[80]; 
+ char   autor[80]; 
+struct info_aluno status[2];   //Obs.: (p->status+i)->sigla
+} livro; 
+
+struct  info_livro{ 
+ char  sigla;    // [L]ivre, [E]mprestado, [R]eservado 
+ int  reg;   // registro do livro 
+}; 
 
 typedef struct  aluno{
 	
@@ -40,20 +57,118 @@ typedef struct  aluno{
 
 }aluno;	//Obs.: (p->tabela+i)->reg
 
-
-
+void consulta_livros(aluno *al,livro *lv,int count);
+int verifica_livro();
+void cadastra_livro(livro *lv,int count);
 void aloca_aluno(aluno **al,int count);
+void aloca_livro(livro **lv, int count);
 int verifica();
 void grava_aluno(aluno *al);
-void cadastra_aluno(aluno *al,int count);
-void mostra_cadastros(aluno *al,int count);
-void mostra_individual(aluno *al,int count);
+void cadastra_aluno(aluno *al,livro *lv,int count);
+void mostra_cadastros(aluno *al,livro *lv,int count);
+void mostra_individual(aluno *al,livro *lv,int count);
 void cadastra_info_livro(aluno *al,int count);
 int verifica_ra(aluno *al,int count);
+void grava_livro(livro *lv);
+
 
 //void mostra_tabelas(aluno *al,int count); // teste
 
-void cadastra_aluno(aluno *al,int count)
+int main()
+{
+	char op;
+	int sw;
+	int count = 0;
+	int contdr = 0;
+	
+	livro *lv = NULL;
+	aluno *al = NULL;
+	FILE *f = NULL;
+	
+	aloca_aluno(&al,1);
+	aloca_livro(&lv,1);
+
+	count = verifica();
+	contdr = verifica_livro();
+	
+	cadastra_info_livro(al,4);
+	cadastra_livro(lv,4);
+	
+	
+	do
+	{
+		printf("\n\tMenu \n[1] Cadastro Aluno \n[2] Mostra Aluno Total \n[3] Mostra Aluno Parcial \n[4] Consulta de LIVROS \n[5] Fim\nResposta:");
+		scanf("%i",&sw);
+		fflush(stdin);
+		
+		switch(sw)
+		{
+			case 1:
+				cadastra_aluno(al,lv,count+1);
+				count++;
+				break;
+			case 2:
+				mostra_cadastros(al,lv,count);
+				break;
+			case 3:
+				mostra_individual(al,lv,count);
+				break;
+			case 4:
+				consulta_livros(al,lv,count);
+				break;
+				case 5:
+				exit(1);
+				break;
+			case 6:
+				//mostra_tabelas(al,4); // teste secreto
+				break;
+		}
+		printf("\nDESEJA SAIR DO PROGRAMA (S/N)\nResposta: ");
+		scanf("%c",&op);
+		fflush(stdin);
+		
+	}while(op != 'N' && op != 'n');
+	exit(1);
+	
+}
+
+void cadastra_livro(livro *lv,int count)
+{
+	int i;
+	int j;
+
+
+	for(i=0;i<1;i++,lv++)
+	{
+
+		lv->reg_livro = j+i;
+		strcpy(lv->titulo,"Diario de um banana");
+		strcpy(lv->autor,"Eu");
+
+	}
+	for(i=0;i<1;i++,lv++)
+	{
+		lv->reg_livro = j+i;
+		strcpy(lv->titulo,"Moca do meu coracao");
+		strcpy(lv->autor,"Vc");
+	}
+	for(i=0;i<1;i++,lv++)
+	{
+		lv->reg_livro = j+i;
+		strcpy(lv->titulo,"Artick monkei");
+		strcpy(lv->autor,"Lv");
+	}
+	for(i=0;i<1;i++,lv++)
+	{
+		lv->reg_livro = j+i;
+		strcpy(lv->titulo,"Noite");
+		strcpy(lv->autor,"Friends");
+	}
+
+	grava_livro(lv);
+}
+
+void cadastra_aluno(aluno *al,livro *lv,int count)
 {
 	char ra[7];
 	int verifica;
@@ -65,54 +180,6 @@ void cadastra_aluno(aluno *al,int count)
 	al->emprestado = 0;
 	al->reservado = 0;
 	grava_aluno(al);
-}
-
-main()
-{
-	char op;
-	int sw;
-	int count = 0;
-	
-	aluno *al = NULL;
-	FILE *f = NULL;
-	
-	aloca_aluno(&al,1);
-	count = verifica();
-	
-	cadastra_info_livro(al,4);
-	
-	
-	do
-	{
-		printf("\n\tMenu \n[1] Cadastro Aluno \n[2] Mostra Aluno Total \n[3] Mostra Aluno Parcial \n[4] Fim\nResposta:");
-		scanf("%i",&sw);
-		fflush(stdin);
-		
-		switch(sw)
-		{
-			case 1:
-				cadastra_aluno(al,count+1);
-				count++;
-				break;
-			case 2:
-				mostra_cadastros(al,count);
-				break;
-			case 3:
-				mostra_individual(al,count);
-				break;
-			case 4:
-				exit(1);
-				break;
-			case 5:
-				//mostra_tabelas(al,4); // teste secreto
-				break;
-		}
-		printf("\nDESEJA CONTINUAR (S/N)\nResposta: ");
-		scanf("%c",&op);
-		fflush(stdin);
-		
-	}while(op != 'N' && op != 'n');
-	
 }
 
 void cadastra_info_livro(aluno *al,int count)
@@ -133,7 +200,7 @@ void cadastra_info_livro(aluno *al,int count)
 	
 }
 
-void mostra_individual(aluno *al,int count)
+void mostra_individual(aluno *al,livro *lv,int count)
 {
 	char ra[7];
 	int aux;
@@ -177,7 +244,7 @@ void mostra_individual(aluno *al,int count)
 
 
 
-void mostra_cadastros(aluno *al,int count)
+void mostra_cadastros(aluno *al,livro *lv,int count)
 {
 	int i;
 	
@@ -216,6 +283,18 @@ void grava_aluno(aluno *al)
 		fwrite(al,sizeof(aluno),1,f);
 	fclose(f);
 }
+void grava_livro(livro *lv)
+{
+	FILE *f = fopen("livro.bin","ab");
+	fseek(f,sizeof(livro),2);
+	if(f==NULL)
+	{
+		printf("\n\nErro");
+	}
+	else
+		fwrite(lv,sizeof(livro),1,f);
+	fclose(f);
+}
 
 int verifica()
 {
@@ -231,11 +310,35 @@ int verifica()
 		fclose(f);
 		return count;
 	}
-}
+}//verifica
+
+int verifica_livro()
+{
+	long int count = 0;
+
+	FILE *f = fopen("livros.bin","rb");
+
+	if(f == NULL)
+	{
+		return count;
+	}
+		else
+	{
+		fseek(f,0,2);
+		count = ftell(f)/sizeof(livro);
+		fclose(f);
+		return count;
+	}
+}//verifica
 
 void aloca_aluno(aluno **al,int count)
 {
 	if((*al=(aluno*)realloc(*al,count*sizeof(aluno)))==NULL)
+		exit(1);
+}
+void aloca_livro(livro **lv, int count)
+{
+	if((*lv=(livro*)realloc(*lv,count*sizeof(livro)))==NULL)
 		exit(1);
 }
 
