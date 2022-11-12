@@ -58,6 +58,35 @@ typedef struct  aluno{
 }aluno;	//Obs.: (p->tabela+i)->reg
 
 void consulta_livros(aluno *al,livro *lv,int count);
+/*int escolha_livro(aluno *al,livro *lv,int count);
+int escolha_livro(aluno *al,livro *lv,int count)
+{
+	int i;
+	char titulo2[80];
+
+	for (i=0; i < count; ++i, lv++)
+	{
+		printf("\nTitulo : %s",lv->titulo);
+		printf("\tAutor : %s",lv->autor);
+		printf("\tREGISTRO DO LIVRO : %i",lv->reg_livro);
+
+	}
+
+	printf("\nEscolha o Livro:");
+	gets(titulo2);
+	printf("\n\nEscolha feita %s",titulo2);
+	for(i=0;i<count;i++,lv++)
+	{	
+		printf("entrouasdasd");
+		if(strcasecmp(titulo2,lv->titulo) == 0)
+		{
+		return 2;
+		}
+	}
+	return -1;
+	
+}*/
+
 int verifica_livro();
 void cadastra_livro(livro *lv,int count);
 void aloca_aluno(aluno **al,int count);
@@ -70,9 +99,11 @@ void mostra_individual(aluno *al,livro *lv,int count);
 void cadastra_info_livro(aluno *al,int count);
 int verifica_ra(aluno *al,int count);
 void grava_livro(livro *lv);
+void mostra_cadastra_livro(livro *lv,int count);
 
 
 //void mostra_tabelas(aluno *al,int count); // teste
+//void mostra_cadastra_livro(livro *lv,int count); // teste
 
 int main()
 {
@@ -86,14 +117,13 @@ int main()
 	FILE *f = NULL;
 	
 	aloca_aluno(&al,1);
-	aloca_livro(&lv,1);
+	aloca_livro(&lv,4);
 
 	count = verifica();
 	contdr = verifica_livro();
 	
 	cadastra_info_livro(al,4);
 	cadastra_livro(lv,4);
-	
 	
 	do
 	{
@@ -114,72 +144,116 @@ int main()
 				mostra_individual(al,lv,count);
 				break;
 			case 4:
-				consulta_livros(al,lv,count);
+				consulta_livros(al,lv,contdr);
 				break;
-				case 5:
+			case 5:
 				exit(1);
 				break;
 			case 6:
 				//mostra_tabelas(al,4); // teste secreto
 				break;
 		}
+
 		printf("\nDESEJA SAIR DO PROGRAMA (S/N)\nResposta: ");
 		scanf("%c",&op);
 		fflush(stdin);
 		
 	}while(op != 'N' && op != 'n');
-	exit(1);
 	
 }
+void consulta_livros(aluno *al,livro *lv,int count)
+{
+	int i;
+	FILE *f = fopen("livro.bin","rb");
 
+	if(f == NULL)
+	{
+		printf("Erro\n");
+	}
+	else{	
+
+		for(i=0;i<4;i++,lv++)
+		{
+			printf("\n%s",lv->titulo);
+			printf("\n%s",lv->autor);
+			printf("\n%i\n\n",lv->reg_livro);
+		}
+	fclose(f);
+	}
+}
 void cadastra_livro(livro *lv,int count)
 {
 	int i;
-	int j;
+	int j = 1;
 
 
 	for(i=0;i<1;i++,lv++)
 	{
 
 		lv->reg_livro = j+i;
-		strcpy(lv->titulo,"Diario de um banana");
+		strcpy(lv->titulo,"Diario-de-um-banana");
 		strcpy(lv->autor,"Eu");
+		printf("\n%s",lv->titulo);
+		printf("\n%s",lv->autor);
+		printf("\n%i\n\n",lv->reg_livro);
+		j++;
 
 	}
 	for(i=0;i<1;i++,lv++)
 	{
 		lv->reg_livro = j+i;
-		strcpy(lv->titulo,"Moca do meu coracao");
-		strcpy(lv->autor,"Vc");
+		strcpy(lv->titulo,"Moao");
+		strcpy(lv->autor,"VC");
+		printf("\n%s",lv->titulo);
+		printf("\n%s",lv->autor);
+		printf("\n%i\n\n",lv->reg_livro);
+		j++;
 	}
 	for(i=0;i<1;i++,lv++)
 	{
 		lv->reg_livro = j+i;
-		strcpy(lv->titulo,"Artick monkei");
+		strcpy(lv->titulo,"Artick-monkei");
 		strcpy(lv->autor,"Lv");
+		printf("\n%s",lv->titulo);
+		printf("\n%s",lv->autor);
+		printf("\n%i\n\n",lv->reg_livro);
+		j++;
 	}
 	for(i=0;i<1;i++,lv++)
 	{
 		lv->reg_livro = j+i;
 		strcpy(lv->titulo,"Noite");
 		strcpy(lv->autor,"Friends");
+		printf("\n%s",lv->titulo);
+		printf("\n%s",lv->autor);
+		printf("\n%i\n\n",lv->reg_livro);
+		j++;
 	}
-
-	grava_livro(lv);
 }
 
 void cadastra_aluno(aluno *al,livro *lv,int count)
 {
 	char ra[7];
 	int verifica;
+	int verfica_livro2;
+
 	
 	printf("\nNome :");
 	gets(al->nome);
 	printf("\nRA: ");
 	gets(al->RA);
+	strcpy(al->RA,(lv->status)->RA);
+	do{
+
+		verfica_livro2 = escolha_livro(al,lv,4);
+
+	}while(verfica_livro2 == -1);
+	
+	printf("Cadastrado com Sucesso");
 	al->emprestado = 0;
 	al->reservado = 0;
 	grava_aluno(al);
+	grava_livro(lv);
 }
 
 void cadastra_info_livro(aluno *al,int count)
@@ -350,5 +424,14 @@ void aloca_livro(livro **lv, int count)
 		printf("%c",(al->tabela)->sigla);
 	}
 }*/
+void mostra_cadastra_livro(livro *lv,int count)
+{
+	int i;
+	for(i=0;i<count;i++,lv++)
+	{
+		printf("%s",lv->titulo);
+		printf("%s",lv->autor);
+	}
+}
 
 //BY HENRY SANTURIAO ALMEIDA
