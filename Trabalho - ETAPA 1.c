@@ -57,9 +57,7 @@ typedef struct  aluno{
 
 }aluno;	//Obs.: (p->tabela+i)->reg
 
-void consulta_livros(aluno *al,livro *lv,int count);
-/*int escolha_livro(aluno *al,livro *lv,int count);
-int escolha_livro(aluno *al,livro *lv,int count)
+void mostra_livros(aluno *al,livro *lv,int count)
 {
 	int i;
 	char titulo2[80];
@@ -70,22 +68,32 @@ int escolha_livro(aluno *al,livro *lv,int count)
 		printf("\tAutor : %s",lv->autor);
 		printf("\tREGISTRO DO LIVRO : %i",lv->reg_livro);
 
-	}
+	}	
+}
+
+void consulta_livros(aluno *al,livro *lv,int count);
+int escolha_livro(aluno *al,livro *lv,int count);
+
+int escolha_livro(aluno *al,livro *lv,int count)
+{
+	int i;
+	char titulo2[80];
+
+	mostra_livros(al,lv,4);
 
 	printf("\nEscolha o Livro:");
 	gets(titulo2);
 	printf("\n\nEscolha feita %s",titulo2);
 	for(i=0;i<count;i++,lv++)
 	{	
-		printf("entrouasdasd");
+		
 		if(strcasecmp(titulo2,lv->titulo) == 0)
 		{
-		return 2;
+			return i;
 		}
 	}
-	return -1;
-	
-}*/
+	return -1;	
+}
 
 int verifica_livro();
 void cadastra_livro(livro *lv,int count);
