@@ -74,8 +74,6 @@ void grava_livro(livro *lv);
 void mostra_cadastra_livro(livro *lv,int count);
 void emprestar_livro(aluno *al,livro *lv,int count, int contdr);
 
-
-
 	/*for(i=0;i<count;i++,al++)
 	{
 		if(strcasecmp((lv->status)->RA,ra) == 0 && strcasecmp(al->RA,ra) == 0)
@@ -114,6 +112,7 @@ int main()
 		printf("\n\tMenu \n[1] Cadastro Aluno \n[2] Emprestar LIVRO \n[3] Mostra Aluno Total\n[4] Mostra Aluno Parcial \n[5] Consulta de LIVROS \n[6] Fim\nResposta:");
 		scanf("%i",&sw);
 		fflush(stdin);
+		system("cls");
 		
 		switch(sw)
 		{
@@ -159,18 +158,11 @@ void cadastra_aluno(aluno *al,livro *lv)
 	printf("\nRA: ");
 	scanf("%s",&ra);
 	fflush(stdin);
-
-	strcpy((lv->status)->RA,ra);
 	strcpy(al->RA,ra);
-
 	al->emprestado = 0;
 	al->reservado = 0;
-	strcpy(lv->titulo,"NONE");
-	strcpy(lv->autor,"NONE");
 	printf("\nCadastrado com Sucesso !");
-
 	grava_aluno(al);
-	grava_livro(lv);
 }
 
 void mostra_livros(aluno *al,livro *lv,int count)
@@ -190,18 +182,50 @@ int escolha_livro(aluno *al,livro *lv,int count)
 {
 	int i;
 	char titulo2[80];
+	int aux,aux2;
 
 	mostra_livros(al,lv,4);
 
 	printf("\nEscolha o Livro:");
 	gets(titulo2);
 	printf("\n\nEscolha feita %s",titulo2);
+	printf("\nDia da retirada (31 dias no max)");
+	scanf("%i",&aux);
+	fflush(stdin);
+	printf("\nMes da retirada (12 meses no max b )");
+	scanf("%i",&aux2);
+	fflush(stdin);
+
+
+	(lv->status)->dia_ret = aux;
+	(lv->status)->mes_ret = aux2;
+	(lv->status)->dia_dev = aux;
+	(lv->status)->mes_dev = aux2+1;
+	strcpy(lv->titulo,titulo2);
+
+
+	printf("\nDia e o mes da devolucao [%i/%i]",(lv->status)->dia_dev,(lv->status)->mes_dev);
+
 
 	for(i=0;i<count;i++,lv++)
 	{
 		if(strcasecmp(titulo2,lv->titulo) == 0)
 		{
 			(lv->status)->sigla = 'E';
+			if(al->emprestado >= 3)
+			{
+				al->emprestado += 1;
+			}
+			else
+			{
+				printf("\nNao pode alugar mais que 3");
+			}
+			if(al->reservado == 1)
+			{
+				printf("\nNao pode reservar mais que 1");
+			}
+			al->reservado += 1;
+			grava_livro(lv);
 			return i;
 		}
 	}
@@ -217,7 +241,7 @@ void emprestar_livro(aluno *al,livro *lv,int count, int contdr)
 	printf("\nRA: ");
 	scanf("%s",&ra);
 	fflush(stdin);
-
+	strcpy((lv->status)->RA,ra);
 	do
 	{
 		verfica_livro2 = escolha_livro(al,lv,4);
@@ -225,11 +249,11 @@ void emprestar_livro(aluno *al,livro *lv,int count, int contdr)
 	}while(verfica_livro2 == -1);
 
 	printf("\nEmprestado com Sucesso\n");
-	
-
-
+	printf("\nPara o RA [%s]",(lv->status)->RA);
+	printf("\nO Livro [%s]",lv->titulo);
 
 }
+
 void consulta_livros(aluno *al,livro *lv,int count)
 {
 	int i;
@@ -392,10 +416,8 @@ void mostra_cadastros(aluno *al,livro *lv,int count,int contdr)
 			printf("\nNome: [%s]",al->nome);
 			printf("\nRA: [%s]",al->RA);
 			printf("\nLivros Emprestados: [%i]",al->emprestado);
-			printf("\nLivros Reservados [%i]\n",al->reservado);
-			printf("\nRA livros [%s]\n",(lv->status)->RA);
-			printf("\nLivro Escolhido [%s]\n",lv->titulo);
-			
+			printf("\nLivros Reservados [%i]",al->reservado);
+			printf("\nLivro emprestado [%s]\n",lv->titulo);
 		}
 	}
 	fclose(f);
