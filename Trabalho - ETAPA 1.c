@@ -65,8 +65,8 @@ void aloca_aluno(aluno **al,int count);
 void aloca_livro(livro **lv, int count);
 int verifica();
 void grava_aluno(aluno *al);
-void cadastra_aluno(aluno *al,livro *lv,int count);
-void mostra_cadastros(aluno *al,livro *lv,int count);
+void cadastra_aluno(aluno *al,livro *lv);
+void mostra_cadastros(aluno *al,livro *lv,int count,int contdr);
 void mostra_individual(aluno *al,livro *lv,int count, int contdr);
 void cadastra_info_livro(aluno *al,int count);
 int verifica_ra(aluno *al,int count);
@@ -118,13 +118,15 @@ int main()
 		switch(sw)
 		{
 			case 1:
-				cadastra_aluno(al,lv,count+1);
+				cadastra_aluno(al,lv);
+				count++;
+				contdr++;
 				break;
 			case 2:
 				emprestar_livro(al,lv,count,contdr);
 				break;
 			case 3:
-				mostra_cadastros(al,lv,count);
+				mostra_cadastros(al,lv,count,contdr);
 				break;
 			case 4:
 				mostra_individual(al,lv,count,contdr);
@@ -148,7 +150,7 @@ int main()
 	
 }
 
-void cadastra_aluno(aluno *al,livro *lv,int count)
+void cadastra_aluno(aluno *al,livro *lv)
 {
 	char ra[7];
 	
@@ -163,7 +165,8 @@ void cadastra_aluno(aluno *al,livro *lv,int count)
 
 	al->emprestado = 0;
 	al->reservado = 0;
-	
+	strcpy(lv->titulo,"NONE");
+	strcpy(lv->autor,"NONE");
 	printf("\nCadastrado com Sucesso !");
 
 	grava_aluno(al);
@@ -221,19 +224,16 @@ void emprestar_livro(aluno *al,livro *lv,int count, int contdr)
 
 	}while(verfica_livro2 == -1);
 
+	printf("\nEmprestado com Sucesso\n");
+	
+
 
 
 }
 void consulta_livros(aluno *al,livro *lv,int count)
 {
 	int i;
-	FILE *f = fopen("livro.bin","rb");
 
-	if(f == NULL)
-	{
-		printf("Erro\n");
-	}
-	else{	
 
 		for(i=0;i<4;i++,lv++)
 		{
@@ -242,9 +242,8 @@ void consulta_livros(aluno *al,livro *lv,int count)
 		printf("\tREGISTRO DO LIVRO : %i\n",lv->reg_livro);
 		printf("\tStatus do Livro: %c\n",(lv->status)->sigla);
 		}
-	fclose(f);
 	}
-}
+
 void cadastra_livro(livro *lv,int count)
 {
 	int i;
@@ -297,7 +296,6 @@ void cadastra_livro(livro *lv,int count)
 		printf("\n%i\n\n",lv->reg_livro);
 		j++;
 	}
-	grava_livro(lv);
 }
 
 
@@ -372,9 +370,10 @@ void mostra_individual(aluno *al,livro *lv,int count,int contdr)
 
 
 
-void mostra_cadastros(aluno *al,livro *lv,int count)
+void mostra_cadastros(aluno *al,livro *lv,int count,int contdr)
 {
 	int i;
+	int j = 0;
 	
 	FILE *f = fopen("aluno.bin","rb");
 	FILE *f2 = fopen("livro.bin","rb");
@@ -383,18 +382,24 @@ void mostra_cadastros(aluno *al,livro *lv,int count)
 		printf("\nErro\n");
 	else
 	{
-		for(i=0;i<count;i++)
+		for(i=0;i<count;i++,j++)
 		{
 			fseek(f,i*sizeof(aluno),0);
 			fread(al,sizeof(aluno),1,f);
+			fseek(f2,j*sizeof(livro),0);
+			fread(lv,sizeof(livro),1,f2);
+
 			printf("\nNome: [%s]",al->nome);
 			printf("\nRA: [%s]",al->RA);
 			printf("\nLivros Emprestados: [%i]",al->emprestado);
-			printf("\nLivros Reservados [%i]\n\n",al->reservado);
-			printf("\nRA livros [%s]\n\n",(lv->status)->RA);
+			printf("\nLivros Reservados [%i]\n",al->reservado);
+			printf("\nRA livros [%s]\n",(lv->status)->RA);
+			printf("\nLivro Escolhido [%s]\n",lv->titulo);
+			
 		}
-	fclose(f);
 	}
+	fclose(f);
+	fclose(f2);
 	system("pause");
 }
 
