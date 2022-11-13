@@ -57,44 +57,8 @@ typedef struct  aluno{
 
 }aluno;	//Obs.: (p->tabela+i)->reg
 
-void mostra_livros(aluno *al,livro *lv,int count)
-{
-	int i;
-	char titulo2[80];
-
-	for (i=0; i < count; ++i, lv++)
-	{
-		printf("\nTitulo : %s",lv->titulo);
-		printf("\tAutor : %s",lv->autor);
-		printf("\tREGISTRO DO LIVRO : %i",lv->reg_livro);
-
-	}	
-}
-
 void consulta_livros(aluno *al,livro *lv,int count);
 int escolha_livro(aluno *al,livro *lv,int count);
-
-int escolha_livro(aluno *al,livro *lv,int count)
-{
-	int i;
-	char titulo2[80];
-
-	mostra_livros(al,lv,4);
-
-	printf("\nEscolha o Livro:");
-	gets(titulo2);
-	printf("\n\nEscolha feita %s",titulo2);
-	for(i=0;i<count;i++,lv++)
-	{	
-		
-		if(strcasecmp(titulo2,lv->titulo) == 0)
-		{
-			return i;
-		}
-	}
-	return -1;	
-}
-
 int verifica_livro();
 void cadastra_livro(livro *lv,int count);
 void aloca_aluno(aluno **al,int count);
@@ -103,15 +67,27 @@ int verifica();
 void grava_aluno(aluno *al);
 void cadastra_aluno(aluno *al,livro *lv,int count);
 void mostra_cadastros(aluno *al,livro *lv,int count);
-void mostra_individual(aluno *al,livro *lv,int count);
+void mostra_individual(aluno *al,livro *lv,int count, int contdr);
 void cadastra_info_livro(aluno *al,int count);
 int verifica_ra(aluno *al,int count);
 void grava_livro(livro *lv);
 void mostra_cadastra_livro(livro *lv,int count);
+void emprestar_livro(aluno *al,livro *lv,int count, int contdr);
 
 
+
+	/*for(i=0;i<count;i++,al++)
+	{
+		if(strcasecmp((lv->status)->RA,ra) == 0 && strcasecmp(al->RA,ra) == 0)
+		{
+			al->
+			(lv->status)->
+		}
+	}*/
+	//printf("\nAluno nao cadastrado");
 //void mostra_tabelas(aluno *al,int count); // teste
 //void mostra_cadastra_livro(livro *lv,int count); // teste
+int verifica_vazio(aluno *al,livro *lv,int count, int contdr);
 
 int main()
 {
@@ -119,7 +95,7 @@ int main()
 	int sw;
 	int count = 0;
 	int contdr = 0;
-	
+
 	livro *lv = NULL;
 	aluno *al = NULL;
 	FILE *f = NULL;
@@ -135,7 +111,7 @@ int main()
 	
 	do
 	{
-		printf("\n\tMenu \n[1] Cadastro Aluno \n[2] Mostra Aluno Total \n[3] Mostra Aluno Parcial \n[4] Consulta de LIVROS \n[5] Fim\nResposta:");
+		printf("\n\tMenu \n[1] Cadastro Aluno \n[2] Emprestar LIVRO \n[3] Mostra Aluno Total\n[4] Mostra Aluno Parcial \n[5] Consulta de LIVROS \n[6] Fim\nResposta:");
 		scanf("%i",&sw);
 		fflush(stdin);
 		
@@ -143,21 +119,23 @@ int main()
 		{
 			case 1:
 				cadastra_aluno(al,lv,count+1);
-				count++;
 				break;
 			case 2:
-				mostra_cadastros(al,lv,count);
+				emprestar_livro(al,lv,count,contdr);
 				break;
 			case 3:
-				mostra_individual(al,lv,count);
+				mostra_cadastros(al,lv,count);
 				break;
 			case 4:
-				consulta_livros(al,lv,contdr);
+				mostra_individual(al,lv,count,contdr);
 				break;
 			case 5:
-				exit(1);
+				consulta_livros(al,lv,contdr);
 				break;
 			case 6:
+				exit(1);
+				break;
+			case 7:
 				//mostra_tabelas(al,4); // teste secreto
 				break;
 		}
@@ -166,8 +144,85 @@ int main()
 		scanf("%c",&op);
 		fflush(stdin);
 		
-	}while(op != 'N' && op != 'n');
+	}while(op != 'q' && op != 'Q');
 	
+}
+
+void cadastra_aluno(aluno *al,livro *lv,int count)
+{
+	char ra[7];
+	
+	printf("\nNome :");
+	gets(al->nome);
+	printf("\nRA: ");
+	scanf("%s",&ra);
+	fflush(stdin);
+
+	strcpy((lv->status)->RA,ra);
+	strcpy(al->RA,ra);
+
+	al->emprestado = 0;
+	al->reservado = 0;
+	
+	printf("\nCadastrado com Sucesso !");
+
+	grava_aluno(al);
+	grava_livro(lv);
+}
+
+void mostra_livros(aluno *al,livro *lv,int count)
+{
+	int i;
+
+	for (i=0; i < count; ++i, lv++)
+	{
+		printf("\n\tTitulo : %s\n",lv->titulo);
+		printf("\tAutor : %s\n",lv->autor);
+		printf("\tREGISTRO DO LIVRO : %i\n",lv->reg_livro);
+		printf("\tStatus do Livro: %c\n",(lv->status)->sigla);
+	}	
+}
+
+int escolha_livro(aluno *al,livro *lv,int count)
+{
+	int i;
+	char titulo2[80];
+
+	mostra_livros(al,lv,4);
+
+	printf("\nEscolha o Livro:");
+	gets(titulo2);
+	printf("\n\nEscolha feita %s",titulo2);
+
+	for(i=0;i<count;i++,lv++)
+	{
+		if(strcasecmp(titulo2,lv->titulo) == 0)
+		{
+			(lv->status)->sigla = 'E';
+			return i;
+		}
+	}
+	return -1;	
+}
+
+void emprestar_livro(aluno *al,livro *lv,int count, int contdr)
+{
+	int i;
+	int verfica_livro2;
+
+	char ra[7];
+	printf("\nRA: ");
+	scanf("%s",&ra);
+	fflush(stdin);
+
+	do
+	{
+		verfica_livro2 = escolha_livro(al,lv,4);
+
+	}while(verfica_livro2 == -1);
+
+
+
 }
 void consulta_livros(aluno *al,livro *lv,int count)
 {
@@ -182,9 +237,10 @@ void consulta_livros(aluno *al,livro *lv,int count)
 
 		for(i=0;i<4;i++,lv++)
 		{
-			printf("\n%s",lv->titulo);
-			printf("\n%s",lv->autor);
-			printf("\n%i\n\n",lv->reg_livro);
+		printf("\n\tTitulo : %s\n",lv->titulo);
+		printf("\tAutor : %s\n",lv->autor);
+		printf("\tREGISTRO DO LIVRO : %i\n",lv->reg_livro);
+		printf("\tStatus do Livro: %c\n",(lv->status)->sigla);
 		}
 	fclose(f);
 	}
@@ -199,6 +255,7 @@ void cadastra_livro(livro *lv,int count)
 	{
 
 		lv->reg_livro = j+i;
+		(lv->status)->sigla = 'L';
 		strcpy(lv->titulo,"Diario-de-um-banana");
 		strcpy(lv->autor,"Eu");
 		printf("\n%s",lv->titulo);
@@ -210,6 +267,7 @@ void cadastra_livro(livro *lv,int count)
 	for(i=0;i<1;i++,lv++)
 	{
 		lv->reg_livro = j+i;
+		(lv->status)->sigla = 'L';
 		strcpy(lv->titulo,"Moao");
 		strcpy(lv->autor,"VC");
 		printf("\n%s",lv->titulo);
@@ -220,6 +278,7 @@ void cadastra_livro(livro *lv,int count)
 	for(i=0;i<1;i++,lv++)
 	{
 		lv->reg_livro = j+i;
+		(lv->status)->sigla = 'L';
 		strcpy(lv->titulo,"Artick-monkei");
 		strcpy(lv->autor,"Lv");
 		printf("\n%s",lv->titulo);
@@ -230,6 +289,7 @@ void cadastra_livro(livro *lv,int count)
 	for(i=0;i<1;i++,lv++)
 	{
 		lv->reg_livro = j+i;
+		(lv->status)->sigla = 'L';
 		strcpy(lv->titulo,"Noite");
 		strcpy(lv->autor,"Friends");
 		printf("\n%s",lv->titulo);
@@ -237,32 +297,10 @@ void cadastra_livro(livro *lv,int count)
 		printf("\n%i\n\n",lv->reg_livro);
 		j++;
 	}
-}
-
-void cadastra_aluno(aluno *al,livro *lv,int count)
-{
-	char ra[7];
-	int verifica;
-	int verfica_livro2;
-
-	
-	printf("\nNome :");
-	gets(al->nome);
-	printf("\nRA: ");
-	gets(al->RA);
-	strcpy(al->RA,(lv->status)->RA);
-	do{
-
-		verfica_livro2 = escolha_livro(al,lv,4);
-
-	}while(verfica_livro2 == -1);
-	
-	printf("Cadastrado com Sucesso");
-	al->emprestado = 0;
-	al->reservado = 0;
-	grava_aluno(al);
 	grava_livro(lv);
 }
+
+
 
 void cadastra_info_livro(aluno *al,int count)
 {
@@ -282,17 +320,21 @@ void cadastra_info_livro(aluno *al,int count)
 	
 }
 
-void mostra_individual(aluno *al,livro *lv,int count)
+void mostra_individual(aluno *al,livro *lv,int count,int contdr)
 {
 	char ra[7];
 	int aux;
+	int aux2;
 	char op;
 	int i;
 	
 	aux = count;
+	aux2 = contdr;
 	
 	FILE *f = fopen("aluno.bin","rb");
-		if(f==NULL)
+	FILE *f2 = fopen("livro.bin","rb");
+
+		if(f==NULL && f2 == NULL)
 			printf("\nErro\n");
 		else
 		{	
@@ -301,13 +343,17 @@ void mostra_individual(aluno *al,livro *lv,int count)
 			scanf("%s",&ra);
 			fflush(stdin);
 			
-			for(aux=0;aux<count;aux++)
+			for(aux=0;aux<count;aux++,aux2++)
 			{
 				
 			fseek(f,aux*sizeof(aluno),0);
 			fread(al,sizeof(aluno),1,f);
+
+			fseek(f2,aux2*sizeof(livro),0);
+			fread(lv,sizeof(livro),1,f2);
+
 			
-				if(strcasecmp(al->RA,ra)==0)
+				if(strcasecmp(al->RA,ra)==0 && strcasecmp((lv->status)->RA,ra) == 0)
 				{
 					printf("\nNome: [%s]",al->nome);
 					printf("\t|RA: [%s]",al->RA);
@@ -315,7 +361,7 @@ void mostra_individual(aluno *al,livro *lv,int count)
 					printf("\t|Livros Reservados [%i]",al->reservado);
 					for(i=0;i<4;i++,al++)
 					{
-						printf("\nTABELA %i [%c - ]",i,(al->tabela)->sigla);
+						printf("\nTABELA %i [%c - %s]",i,(al->tabela)->sigla,lv->titulo);
 					}
 				}	
 			}
@@ -331,10 +377,9 @@ void mostra_cadastros(aluno *al,livro *lv,int count)
 	int i;
 	
 	FILE *f = fopen("aluno.bin","rb");
-	
+	FILE *f2 = fopen("livro.bin","rb");
 
-	
-	if(f==NULL)
+	if(f==NULL && f2 == NULL)
 		printf("\nErro\n");
 	else
 	{
@@ -346,6 +391,7 @@ void mostra_cadastros(aluno *al,livro *lv,int count)
 			printf("\nRA: [%s]",al->RA);
 			printf("\nLivros Emprestados: [%i]",al->emprestado);
 			printf("\nLivros Reservados [%i]\n\n",al->reservado);
+			printf("\nRA livros [%s]\n\n",(lv->status)->RA);
 		}
 	fclose(f);
 	}
